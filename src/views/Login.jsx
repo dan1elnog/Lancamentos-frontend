@@ -1,18 +1,33 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import UserService from '../services/service/userService'
+import LocalStorageService from '../services/service/localStorageService'
+import {errorMessage} from '../components/alerts/Alerts'
 
-export default class Login extends Component {
-    constructor(props){
-        super(props)
-
+class Login extends Component {
+    
+    constructor(){
+        super()
+        this.service = new UserService()
     }
+
     state = {
         email:'',
-        password:''
+        password:'',
     }
 
-    handleLogin(){
-        console.log(this.state.email)
-        console.log(this.state.password)
+    login = () => {
+        this.service.auth({
+            email: this.state.email,
+            password: this.state.password
+        })
+        .then(res => {
+            // Método para armazenar um usuário loggado no local storage 
+            LocalStorageService.addItem('_user', res.data)
+            window.location.href = '/home'
+        }).catch(error => {
+            errorMessage(error.response.data)
+        })
     }
 
   render() {
@@ -34,10 +49,12 @@ export default class Login extends Component {
                 />
             </div>
             <div className='mt-5'>
-                <button className='btn btn-outline-primary mx-1' onClick={() => this.handleLogin()} >Login</button>
-                <button className='btn btn-outline-warning mx-1'>cadastrar</button>
+                <button type='button' className='btn btn-outline-primary mx-1' onClick={() => this.login()} >Login</button>
+                <Link to="/registration" className='btn btn-outline-warning mx-1'>cadastrar</Link>
             </div>
         </form>
     )
   }
 }
+
+export default Login
