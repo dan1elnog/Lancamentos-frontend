@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import UserService from '../services/service/userService'
-import LocalStorageService from '../services/service/localStorageService'
+// import LocalStorageService from '../services/service/localStorageService'
 import {errorMessage} from '../components/alerts/Alerts'
+import { AuthContext } from '../main/AuthProviderClass'
 
 class Login extends Component {
     
@@ -23,7 +24,8 @@ class Login extends Component {
         })
         .then(res => {
             // Método para armazenar um usuário loggado no local storage 
-            LocalStorageService.addItem('_user', res.data)
+            //LocalStorageService.addItem('_user', res.data)
+            this.context.startSession(res.data)
             window.location.href = '/home'
         }).catch(error => {
             errorMessage(error.response.data)
@@ -56,5 +58,7 @@ class Login extends Component {
     )
   }
 }
+
+Login.contextType = AuthContext
 
 export default Login

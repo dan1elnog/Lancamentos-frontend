@@ -7,6 +7,10 @@ import LaunchService from '../services/service/LaunchService'
 import currencyFormatter from "currency-formatter"
 import * as alert from '../components/alerts/Alerts'
 import TrashIcon from '../components/icons/TrashIcon'
+import { Link } from 'react-router-dom'
+import EditIcon from '../components/icons/EditIcon'
+import CancelIcon from '../components/icons/CancelIcon'
+import CheckIcon from '../components/icons/CheckIcon'
 
 const base_url = 'http://localhost:8080/api/launch'
 
@@ -67,6 +71,20 @@ export default class Launch extends Component {
         //     })
     }
 
+    changeStatus(launch, status){
+        this.service.changeStatus(launch, status)
+            .then(res => {
+                const launchs = this.state.launchs
+                const index = launchs.indexOf(launch)
+                if (index !== -1) {
+                    launch['status'] = status
+                    launchs[index] = launch
+                    this.setState(launchs)
+                }
+                alert.successMessage('Sucesso', `Status do lançamento ${res.data.id} atualizado`)
+            })
+    }
+
     render() {
         const footerDialog = (
             <div>
@@ -104,7 +122,7 @@ export default class Launch extends Component {
                                 <button onClick={() => this.search()} type='button' className='btn btn-outline-info me-1' >
                                     <SearchIcon w={15} h={15}/> buscar
                                 </button>
-                                <button className='btn btn-outline-success ms-1'>+ cadastrar</button>
+                                <Link to={'/launch-registration'} className='btn btn-outline-success ms-1'>+ cadastrar</Link>
                             </div>
                         </form>
                     </div>
@@ -128,12 +146,16 @@ export default class Launch extends Component {
                                     <td>R${currencyFormatter.format(launch.value, 'pt-BR')}</td>
                                     <td>{launch.type}</td>
                                     <td>{launch.month}</td>
-                                    <td>{launch.type}</td>
+                                    <td>{launch.status}</td>
                                     <td>
-                                        <button type='button' onClick={e => {console.log(launch.id)}}>edit</button>
-                                        <button type='button' className='btn btn-danger ' 
+                                        <button className='btn btn-success p-3'  
+                                            onClick={() => this.changeStatus(launch, 'EFETIVADO')}><CheckIcon/></button>
+                                        <button className='btn btn-warning p-3' 
+                                            onClick={() => this.changeStatus(launch, 'CANCELADO')}><CancelIcon/></button>
+                                        <Link className='btn btn-info p-3' to={`/launch-registration/${launch.id}`}><EditIcon/></Link>
+                                        <button type='button' className='btn btn-danger p-3' 
                                             onClick={e => {this.openConfirm(launch)}}>
-                                            <TrashIcon w={25} h={25} />
+                                            <TrashIcon w={20} h={20} />
                                         </button>
                                     </td>
                                 </tr>
